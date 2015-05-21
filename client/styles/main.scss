@@ -1,0 +1,23 @@
+#main-container {
+  .channel-row {
+    cursor: pointer;
+  }
+}
+#add-team-form {
+  input {
+    width: 500px;
+  }
+}
+
+#channel-container {
+  .message {
+    margin-bottom: 30px;
+    padding-bottom: 5px;
+    border-bottom: 1px dotted #B3A9A9;
+
+    .content {
+      margin: 0px;
+      color: #777777;
+    }
+  }
+}

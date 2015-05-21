@@ -1,0 +1,5 @@
+{
+  "fetchInitial": false,
+  "baseTeamAuthToken": "AUTH_TOKEN",
+  "baseTeamRelayChannelName": "CHANNEL_NAME"
+}
