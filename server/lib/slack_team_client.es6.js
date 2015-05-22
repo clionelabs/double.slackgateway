@@ -22,7 +22,9 @@ SlackTeamClient.prototype = {
     if (Meteor.settings.fetchInitial) {
       this._fetchAllChannels();
     }
-  },
+    // console.log("client: ", this.client);
+  }
+  ,
 
   clientOnMessage: function(message) {
     let self = this;
@@ -58,10 +60,14 @@ SlackTeamClient.prototype = {
   _fetchAllChannels: function() {
     let self = this;
     _.each(_.values(self.client.channels), function(channel) {
-      self._fetchChannel(channel);
+      if (channel.is_member) {
+        self._fetchChannel(channel);
+      }
     });
     _.each(_.values(self.client.dms), function(dm) {
-      self._fetchChannel(dm);
+      if (dm.is_open) {
+        self._fetchChannel(dm);
+      }
     });
     _.each(_.values(self.client.groups), function(group) {
       self._fetchChannel(group);
@@ -104,11 +110,18 @@ SlackTeamClient.prototype = {
       return;
     }
 
-    oldest = teamChannel.lastMessageTS? teamChannel.lastMessageTS: 0;
+    let params = {channel: channelId};
+    if (Meteor.settings.fetchMax) {
+      _.extend(params, {count: Meteor.settings.fetchMax});
+    }
+    if (teamChannel.lastMessageTS) {
+      _.extend(params, {oldest: teamChannel.lastMessageTS});
+    }
 
-    console.log("[SlackTeamClient] fetching messages: ", JSON.stringify({channel: channelId, oldest: oldest}));
-    self.client._apiCall(method, {channel: channelId, oldest: oldest}, Meteor.bindEnvironment(function(result) {
-      console.log("[SlackTeamClient] inserting messages: ", JSON.stringify(result));
+    console.log("[SlackTeamClient] fetching messages: ", JSON.stringify(params));
+    self.client._apiCall(method, params, Meteor.bindEnvironment(function(result) {
+      // console.log("[SlackTeamClient] inserting messages: ", JSON.stringify(result));
+      console.log("[SlackTeamClient] inserting messages: ", result.messages.length);
       _.each(result.messages, function(message) {
         _.extend(message, {teamId: teamId, channel: channelId});
         self._insertMessage(message);

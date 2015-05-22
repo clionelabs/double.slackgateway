@@ -1,5 +1,6 @@
 {
   "fetchInitial": false,
+  "fetchMax": 1000,
   "baseTeamAuthToken": "AUTH_TOKEN",
   "baseTeamRelayChannelName": "CHANNEL_NAME"
 }

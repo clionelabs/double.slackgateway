@@ -4,10 +4,18 @@
 
 <Template name="main">
   <div id="main-container" class="container-fluid">
-    {{#each teams}}
-      {{> team}}
-    {{/each}}
-    {{> teamSetup}}
+    <ul class="nav nav-tabs">
+      {{#each teams}}
+        <li role="presentation" class="team-tab{{#if isActiveTeam this}} active{{/if}}"><a href="#">{{teamName}}</a></li>
+      {{/each}}
+      <li role="presentation" class="team-setup-tab{{#if isSetup}} active{{/if}}"><a href="#">Team Setup</a></li>
+    </ul>
+
+    {{#if activeTeam}}
+      {{> team activeTeam}}
+    {{else}}
+      {{> teamSetup}}
+    {{/if}}
   </div>
 </Template>
 
