@@ -97,7 +97,7 @@ SlackTeamClient.prototype = {
     let self = this;
     let method = 'channels.history';
     if (channel.getType() === 'Group') {
-      method = 'group.history';
+      method = 'groups.history';
     } else if (channel.getType() === 'DM') {
       method = 'im.history';
     }
@@ -120,7 +120,6 @@ SlackTeamClient.prototype = {
 
     console.log("[SlackTeamClient] fetching messages: ", JSON.stringify(params));
     self.client._apiCall(method, params, Meteor.bindEnvironment(function(result) {
-      // console.log("[SlackTeamClient] inserting messages: ", JSON.stringify(result));
       console.log("[SlackTeamClient] inserting messages: ", result.messages.length);
       _.each(result.messages, function(message) {
         _.extend(message, {teamId: teamId, channel: channelId});
