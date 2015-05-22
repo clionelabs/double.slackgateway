@@ -120,6 +120,9 @@ SlackTeamClient.prototype = {
 
     console.log("[SlackTeamClient] fetching messages: ", JSON.stringify(params));
     self.client._apiCall(method, params, Meteor.bindEnvironment(function(result) {
+      if (!result.ok) {
+        console.log("[SlackTeamClient] fetch failed: ", result);
+      }
       console.log("[SlackTeamClient] inserting messages: ", result.messages.length);
       _.each(result.messages, function(message) {
         _.extend(message, {teamId: teamId, channel: channelId});

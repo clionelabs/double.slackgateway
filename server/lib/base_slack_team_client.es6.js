@@ -51,17 +51,45 @@ BaseSlackTeamClient.prototype = {
     TeamChannelMessages.find({relayedAt: null, channelId: {$ne: self.relayChannel.id},  ts: {$gt: current}}, {sort: {ts: 1}, limit: 1}).observe({
       slackClient: self,
       added: function(message) {
+        this.slackClient._relayMessage(message, function(result) {
+          console.log("send message: ", result);
+          if (result.ok) {
+            TeamChannelMessages.update({_id: message._id}, {$set: {relayedAt: moment().valueOf()}});
+          }
+        });
+        /*
         let result = this.slackClient._relayMessage(message);
         if (result.id) {
           TeamChannelMessages.update({_id: message._id}, {$set: {relayedAt: moment().valueOf()}});
         }
+        */
       }
     });
   },
 
-  _relayMessage: function(message) {
+  _relayMessage: function(message, callback) {
     let self = this;
     let relayMessage = self._buildRelayedMessage(message);
+    let channel = self.relayChannel;
+
+    let icon_emoji = message.userName === Meteor.settings.doubleUserName? ':troll:': ':alien:';
+
+    let method = 'chat.postMessage';
+    let params = {
+      channel: channel.id,
+      text: relayMessage,
+      username: `${message.userName} @ ${message.teamName}`,
+      icon_emoji: icon_emoji
+    }
+    self.client._apiCall(method, params, Meteor.bindEnvironment(function(result) {
+      callback(result);
+    }));
+  },
+
+  __relayMessage: function(message) {
+    let self = this;
+    let relayMessage = self._buildRelayedMessage(message);
+
     let result = self.relayChannel.send(relayMessage);
     return result;
   },
@@ -69,12 +97,8 @@ BaseSlackTeamClient.prototype = {
   _buildRelayedMessage: function(message) {
     let time = moment(parseInt(message.ts) * 1000).format('MM-DD HH:mm:ss');
     let detailsURL = Router.routes.channel.url({channelId: message.channelId});
-    return `[From ${message.teamName} - ${message.userName} - ${time}] \n ${message.text} \n Full Conversation: ${detailsURL}`;
-  },
-
-  _sendMessage: function(channelId, message) {
-    let channel = this.client.getChannelGroupOrDMByID(channelId);
-    let result = channel.send(message);
-    return result;
-  },
+    return `${message.text} \n <${detailsURL}|Full Conversation>`
+    // return `*${message.userName}* @ ${message.teamName}, ${time} \n ... ${message.text} \n Full Conversation: ${detailsURL}`
+    // return `[From ${message.teamName} - ${message.userName} - ${time}] \n ${message.text} \n Full Conversation: ${detailsURL}`;
+  }
 }

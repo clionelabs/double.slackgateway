@@ -2,5 +2,11 @@
   "fetchInitial": false,
   "fetchMax": 1000,
   "baseTeamAuthToken": "AUTH_TOKEN",
-  "baseTeamRelayChannelName": "CHANNEL_NAME"
+  "baseTeamRelayChannelName": "CHANNEL_NAME",
+  "doubleUserName": "gateway",
+
+  "adminAccount": {
+    "email": "admin@askdouble.com",
+    "password": "uSTeuMgbykK2uFrvX"
+  }
 }
