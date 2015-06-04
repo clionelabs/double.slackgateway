@@ -6,7 +6,7 @@ SlackTeamClient = function(authToken) {
 SlackTeamClient.prototype = {
   init: function(authToken) {
     let self = this;
-    this.client = new Slack(authToken, true, true); // autoReconnect = true, autoMark = true
+    this.client = new Slack(authToken, true, false); // autoReconnect = true, autoMark = true
     this.client.on('open', Meteor.bindEnvironment(() => {self.clientOnOpen()}));
     this.client.on('message', Meteor.bindEnvironment((message) => {self.clientOnMessage(message)}));
     this.client.on('error', Meteor.bindEnvironment(() => {self.clientOnError()}));
