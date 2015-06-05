@@ -22,7 +22,6 @@ SlackTeamClient.prototype = {
     if (Meteor.settings.fetchInitial) {
       this._fetchAllChannels();
     }
-    // console.log("client: ", this.client);
   }
   ,
 
@@ -34,6 +33,17 @@ SlackTeamClient.prototype = {
 
   clientOnError: function(error) {
     console.log('clientOnError: ', error);
+  },
+
+  // @Uxxxxx -> username
+  _decodeMessageText: function(text) {
+    // quick check if the text contains user encoding phrases
+    if (text.match('<@U.*>')) {
+      _.each(_.values(this.client.users), function(user) {
+        text = text.replace(`<@${user.id}>`, `@${user.name}`);
+      });
+    }
+    return text;
   },
 
   _insertMessage: function(message) {
@@ -49,7 +59,7 @@ SlackTeamClient.prototype = {
         teamName: self.client.team.name,
         channelId: channelId,
         channelName: channel.name,
-        text: message.text,
+        text: self._decodeMessageText(message.text),
         userName: userName,
         ts: message.ts
       }

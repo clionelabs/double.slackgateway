@@ -5,8 +5,10 @@ SlackService = {
     console.log("SlackService startup");
 
     // Setup base slack team
-    let authToken = Meteor.settings.baseTeamAuthToken;
-    SlackService.baseTeamClient = new BaseSlackTeamClient(authToken);
+    if (Meteor.settings.baseTeamAuthToken) {
+      let authToken = Meteor.settings.baseTeamAuthToken;
+      SlackService.baseTeamClient = new BaseSlackTeamClient(authToken);
+    }
 
     // Setup client slack teams
     Teams.find().observe({
